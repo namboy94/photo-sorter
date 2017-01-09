@@ -1,6 +1,7 @@
 import os
 import sys
 import shutil
+import exifread
 from PIL import Image
 from subprocess import Popen
 
@@ -20,16 +21,24 @@ def ensure_dependencies_installed():
 
 def parse_args():
 
-	if len(sys.argv) != 2:
-		print("Usage: python photosorter.py <DCIM-directory>")
+	if len(sys.argv) < 2:
+		print("Usage: python photosorter.py <DCIM-directories,>")
 		exit()
 	else:
-		directory = sys.argv[1]
-		if not os.path.isdir(directory):
-			print("Error, " + directory + " is not a directory")
+		directories = []
+		for i in range(1, len(sys.argv)):
+			directory = sys.argv[i]
+			if not os.path.isdir(directory):
+				print("Error, " + directory + " is not a directory")
+				exit()
+			else:
+				directories.append(directory)
+
+		if len(directories) < 1:
+			print("Usage: python photosorter.py <DCIM-directories,>")
 			exit()
 		else:
-			return directory
+			return directories
 
 def redo_directory_structure(directory):
 
@@ -110,6 +119,8 @@ def convert_missing_jpegs_from_raw(directory):
 
 def convert_raw_to_jpg(raw_source, jpg_destination):
 
+	original_date = get_date_taken_cr2(raw_source)
+
 	image_name = os.path.basename(raw_source).rsplit(".CR2", 1)[0]
 	raw_dir = os.path.dirname(raw_source)
 	generated_jpg_file = os.path.join(raw_dir, image_name + ".jpg")
@@ -151,17 +162,59 @@ def downsize_jpg(source, destination, size=500000):
 		Popen(jpegoptim_command).wait()
 
 def get_date_taken(image_file):
+
+	print(image_file)
+
 	date = Image.open(image_file)._getexif()[36867]
+	return parse_date_string(date)
 
-	year = int(date.split(":")[0])
-	month = int(date.split(":")[1])
-	day = int(date.split(":")[2].split(" ")[0])
+def get_date_taken_cr2(image_file):
 
-	hour = int(date.split(" ")[1].split(":")[0])
-	minute = int(date.split(" ")[1].split(":")[1])
-	second = int(date.split(" ")[1].split(":")[2])
+	with open(image_file, 'rb') as f:
+		date = str(exifread.process_file(f)["EXIF DateTimeOriginal"])
+	return parse_date_string(date)
 
-	return year, month, day, hour, minute, second
+def parse_date_string(date):
+
+	year = date.split(":")[0]
+	month = date.split(":")[1]
+	day = date.split(":")[2].split(" ")[0]
+
+	hour = date.split(" ")[1].split(":")[0]
+	minute = date.split(" ")[1].split(":")[1]
+	second = date.split(" ")[1].split(":")[2]
+
+	_date = year + "-" + month + "-" + day
+	_time = hour + "-" + minute + "-" + second
+
+	return  _date + "---" + _time
+
+def rename_images_by_date(directory):
+
+	hq_dir = os.path.join(directory, "Images", "High Quality")
+	raw_dir = os.path.join(directory, "Images", "Raw")
+
+	for image in os.listdir(hq_dir):
+		image_path = os.path.join(hq_dir, image)
+		raw_path = os.path.join(raw_dir, image.rsplit(".", 1)[0] + ".CR2")
+
+		new_name = get_date_taken(image_path)
+		new_jpg_file = os.path.join(hq_dir, new_name + ".JPG")
+		new_raw_file = os.path.join(raw_dir, new_name + ".CR2")
+
+		new_jpg_file = avoid_conflicting_filenames(new_jpg_file)
+		new_raw_file = avoid_conflicting_filenames(new_raw_file)
+
+		if new_jpg_file != image_path:
+			os.rename(image_path, new_jpg_file)
+			if os.path.isfile(raw_path):
+				os.rename(raw_path, new_raw_file)
+
+def avoid_conflicting_filenames(file_path):
+	while os.path.isfile(file_path):
+		ext = "." + file_path.rsplit(".", 1)[1]
+		file_path = file_path.split(ext)[0] + "_" + ext
+	return file_path
 
 def get_image_width(image_file):
 	return Image.open(image_file).size[0]
@@ -169,14 +222,54 @@ def get_image_width(image_file):
 def get_image_height(image_file):
 	return Image.open(image_file).size[1]
 
+def merge_directories(directories, destination):
+
+	if not os.path.isdir(destination):
+		os.makedirs(destination)
+	create_directory_structure(destination)
+
+	for directory in directories:
+		move_files_no_conflict(
+			os.path.join(directory, "Images", "Raw"), 
+			os.path.join(destination, "Images", "Raw")
+		)
+		move_files_no_conflict(
+			os.path.join(directory, "Images", "High Quality"), 
+			os.path.join(destination, "Images", "High Quality")
+		)
+		move_files_no_conflict(
+			os.path.join(directory, "Images", "Low Quality"), 
+			os.path.join(destination, "Images", "Low Quality")
+		)
+		move_files_no_conflict(
+			os.path.join(directory, "Videos"), 
+			os.path.join(destination, "Videos")
+		)
+
+def move_files_no_conflict(source, destination):
+	# Checks for conflicts
+
+	for image in os.listdir(source):
+		image_file = os.path.join(source, image)
+		dest_file = os.path.join(dest, image)
+
+		while os.path.isfile(dest_file):
+			ext = "." + dest_file.rsplit(".", 1)[1]
+			dest_file = dest_file.split(ext)[0] + "_" + ext
+
+		os.rename(image_file, dest_file)
 
 if __name__ == "__main__":
 
 	ensure_dependencies_installed()
-	directory = parse_args()
-	redo_directory_structure(directory)
-	convert_missing_jpegs_from_raw(directory)
-	convert_to_low_quality_jpg(directory)
+	directories = parse_args()
 
+	for directory in directories:
+		redo_directory_structure(directory)
+		convert_missing_jpegs_from_raw(directory)
+		rename_images_by_date(directory)
+		convert_to_low_quality_jpg(directory)
 
-
+	if len(directories) > 1:
+		destination = os.path.join(os.path.dirname(directories[0]), "Merged")
+		merge_directories(directories, destination)
