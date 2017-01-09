@@ -1,6 +1,7 @@
 import os
 import sys
 import shutil
+from PIL import Image
 from subprocess import Popen
 
 def dependency_check(dependency):
@@ -139,6 +140,19 @@ def downsize_jpg(source, destination, size="500k"):
 	shutil.copyfile(source, destination)
 	jpegoptim_command = ["jpegoptim", "--size=" + size, destination]
 	Popen(jpegoptim_command).wait()
+
+def get_date_taken(image_file):
+	date = Image.open(image_file)._getexif()[36867]
+
+	year = int(date.split(":")[0])
+	month = int(date.split(":")[1])
+	day = int(date.split(":")[2].split(" ")[0])
+
+	hour = int(date.split(" ")[1].split(":")[0])
+	minute = int(date.split(" ")[1].split(":")[1])
+	second = int(date.split(" ")[1].split(":")[2])
+
+	return year, month, day, hour, minute, second
 
 
 if __name__ == "__main__":
