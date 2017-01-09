@@ -11,7 +11,7 @@ def dependency_check(dependency):
 	return False
 
 def ensure_dependencies_installed():
-	dependencies = ["exiftool", "jpegoptim"]
+	dependencies = ["exiftool", "jpegoptim", "convert"]
 
 	for dependency in dependencies:
 		if not dependency_check(dependency):
@@ -135,11 +135,20 @@ def convert_to_low_quality_jpg(directory):
 			low_quality_image_file = os.path.join(low_quality_dir, image)
 			downsize_jpg(high_quality_image_file, low_quality_image_file)
 
-def downsize_jpg(source, destination, size="500k"):
+def downsize_jpg(source, destination, size=500000):
 	
 	shutil.copyfile(source, destination)
-	jpegoptim_command = ["jpegoptim", "--size=" + size, destination]
-	Popen(jpegoptim_command).wait()
+
+	if get_image_width(destination) < get_image_height(destination):
+		resolution = "x1920"
+	else:
+		resolution = "1920"
+
+	Popen(["convert", "-resize", resolution, destination, destination]).wait()
+
+	if os.path.getsize(destination) > size:
+		jpegoptim_command = ["jpegoptim", "--size=" + str(size), destination]
+		Popen(jpegoptim_command).wait()
 
 def get_date_taken(image_file):
 	date = Image.open(image_file)._getexif()[36867]
@@ -153,6 +162,12 @@ def get_date_taken(image_file):
 	second = int(date.split(" ")[1].split(":")[2])
 
 	return year, month, day, hour, minute, second
+
+def get_image_width(image_file):
+	return Image.open(image_file).size[0]
+
+def get_image_height(image_file):
+	return Image.open(image_file).size[1]
 
 
 if __name__ == "__main__":
