@@ -21,275 +21,276 @@ import exifread
 from PIL import Image
 from subprocess import Popen
 
-def dependency_check(dependency):
-	for path in os.environ["PATH"].split(":"):
-		if os.path.isfile(os.path.join(path, dependency)):
-			return True
-	return False
-
 def ensure_dependencies_installed():
-	dependencies = ["exiftool", "jpegoptim", "convert"]
+    dependencies = ["exiftool", "jpegoptim", "convert"]
 
-	for dependency in dependencies:
-		if not dependency_check(dependency):
-			print("Dependency " + dependency + " not installed")
-			exit()
+    for dependency in dependencies:
+
+        dependency_installed = False
+
+        for path in os.environ["PATH"].split(":"):
+            if os.path.isfile(os.path.join(path, dependency)):
+                dependency_installed = True
+
+        if not dependency_installed:
+            print("Dependency " + dependency + " not installed")
+            exit()
 
 def parse_args():
 
-	if len(sys.argv) < 2:
-		print("Usage: python photosorter.py <DCIM-directories,>")
-		exit()
-	else:
-		directories = []
-		for i in range(1, len(sys.argv)):
-			directory = sys.argv[i]
-			if not os.path.isdir(directory):
-				print("Error, " + directory + " is not a directory")
-				exit()
-			else:
-				directories.append(directory)
+    if len(sys.argv) < 2:
+        print("Usage: python photosorter.py <DCIM-directories,>")
+        exit()
+    else:
+        directories = []
+        for i in range(1, len(sys.argv)):
+            directory = sys.argv[i]
+            if not os.path.isdir(directory):
+                print("Error, " + directory + " is not a directory")
+                exit()
+            else:
+                directories.append(directory)
 
-		if len(directories) < 1:
-			print("Usage: python photosorter.py <DCIM-directories,>")
-			exit()
-		else:
-			return directories
+        if len(directories) < 1:
+            print("Usage: python photosorter.py <DCIM-directories,>")
+            exit()
+        else:
+            return directories
 
 def redo_directory_structure(directory):
 
-	contents = os.listdir(directory)
+    contents = os.listdir(directory)
 
-	if "CANONMSC" in contents:
-		shutil.rmtree(os.path.join(directory, "CANONMSC"))
+    if "CANONMSC" in contents:
+        shutil.rmtree(os.path.join(directory, "CANONMSC"))
 
-	if len(contents) == 2 and "Images" in contents and "Videos" in contents:
-		return
-	else:
-		directory_creation = create_directory_structure(directory)
-		base, raw, high_jpg, low_jpg, videos = directory_creation
+    if len(contents) == 2 and "Images" in contents and "Videos" in contents:
+        return
+    else:
+        directory_creation = create_directory_structure(directory)
+        base, raw, high_jpg, low_jpg, videos = directory_creation
 
-		for folder in contents:
+        for folder in contents:
 
-			if folder in ["Images", "Videos", "CANONMSC"]:
-				continue
-			else:
-				folder_dir = os.path.join(directory, folder)
-				move_files(folder_dir, raw, high_jpg, videos)
+            if folder in ["Images", "Videos", "CANONMSC"]:
+                continue
+            else:
+                folder_dir = os.path.join(directory, folder)
+                move_files(folder_dir, raw, high_jpg, videos)
 
-				if len(os.listdir(folder_dir)) != 0:
-					print("Directory not empty")
-				else:
-					shutil.rmtree(folder_dir)
+                if len(os.listdir(folder_dir)) != 0:
+                    print("Directory not empty")
+                else:
+                    shutil.rmtree(folder_dir)
 
 def create_directory_structure(directory):
 
-	base_picture = os.path.join(directory, "Images")
-	raw = os.path.join(directory, "Images", "Raw")
-	high_quality = os.path.join(directory, "Images", "High Quality")
-	low_quality = os.path.join(directory, "Images", "Low Quality")
-	videos = os.path.join(directory, "Videos")
+    base_picture = os.path.join(directory, "Images")
+    raw = os.path.join(directory, "Images", "Raw")
+    high_quality = os.path.join(directory, "Images", "High Quality")
+    low_quality = os.path.join(directory, "Images", "Low Quality")
+    videos = os.path.join(directory, "Videos")
 
-	if not os.path.isdir(base_picture):
-		os.makedirs(base_picture)
-	if not os.path.isdir(raw):
-		os.makedirs(raw)
-	if not os.path.isdir(high_quality):
-		os.makedirs(high_quality)
-	if not os.path.isdir(low_quality):
-		os.makedirs(low_quality)
-	if not os.path.isdir(videos):
-		os.makedirs(videos)
+    if not os.path.isdir(base_picture):
+        os.makedirs(base_picture)
+    if not os.path.isdir(raw):
+        os.makedirs(raw)
+    if not os.path.isdir(high_quality):
+        os.makedirs(high_quality)
+    if not os.path.isdir(low_quality):
+        os.makedirs(low_quality)
+    if not os.path.isdir(videos):
+        os.makedirs(videos)
 
-	return base_picture, raw, high_quality, low_quality, videos
+    return base_picture, raw, high_quality, low_quality, videos
 
 def move_files(content_dir, raw_dir, jpg_dir, video_dir):
 
-	for image in os.listdir(content_dir):
+    for image in os.listdir(content_dir):
 
-		image_file = os.path.join(content_dir, image)
+        image_file = os.path.join(content_dir, image)
 
-		if image.endswith(".CR2"):
-			os.rename(image_file, os.path.join(raw_dir, image))
-		elif image.endswith(".JPG"):
-			os.rename(image_file, os.path.join(jpg_dir, image))
-		elif image.endswith(".MP4"):
-			os.rename(image_file, os.path.join(video_dir, image))
-		elif image.endswith(".jpg"):
-			capital = image.rsplit(".jpg", 1)[0] + ".JPG"
-			os.rename(image_file, os.path.join(jpg_dir, capital))
-		elif image.endswith(".mp4"):
-			capital = image.rsplit(".mp4", 1)[0] + ".MP4"
-			os.rename(image_file, os.path.join(video_dir, capital))
+        if image.endswith(".CR2"):
+            os.rename(image_file, os.path.join(raw_dir, image))
+        elif image.endswith(".JPG"):
+            os.rename(image_file, os.path.join(jpg_dir, image))
+        elif image.endswith(".MP4"):
+            os.rename(image_file, os.path.join(video_dir, image))
+        elif image.endswith(".jpg"):
+            capital = image.rsplit(".jpg", 1)[0] + ".JPG"
+            os.rename(image_file, os.path.join(jpg_dir, capital))
+        elif image.endswith(".mp4"):
+            capital = image.rsplit(".mp4", 1)[0] + ".MP4"
+            os.rename(image_file, os.path.join(video_dir, capital))
 
 def convert_missing_jpegs_from_raw(directory):
 
-	jpg_dir = os.path.join(directory, "Images", "High Quality")
-	raw_dir = os.path.join(directory, "Images", "Raw")
+    jpg_dir = os.path.join(directory, "Images", "High Quality")
+    raw_dir = os.path.join(directory, "Images", "Raw")
 
-	jpg_images = os.listdir(jpg_dir)
-	raw_images = os.listdir(raw_dir)
+    jpg_images = os.listdir(jpg_dir)
+    raw_images = os.listdir(raw_dir)
 
-	for raw in raw_images:
+    for raw in raw_images:
 
-		image_name = raw.rsplit(".CR2", 1)[0]
-		raw_image_file = os.path.join(raw_dir, raw)
-		destination_jpg_file = os.path.join(jpg_dir, image_name + ".JPG")
+        image_name = raw.rsplit(".CR2", 1)[0]
+        raw_image_file = os.path.join(raw_dir, raw)
+        destination_jpg_file = os.path.join(jpg_dir, image_name + ".JPG")
 
-		if not os.path.isfile(destination_jpg_file):						
-			convert_raw_to_jpg(raw_image_file, destination_jpg_file)
+        if not os.path.isfile(destination_jpg_file):                        
+            convert_raw_to_jpg(raw_image_file, destination_jpg_file)
 
 def convert_raw_to_jpg(raw_source, jpg_destination):
 
-	image_name = os.path.basename(raw_source).rsplit(".CR2", 1)[0]
-	raw_dir = os.path.dirname(raw_source)
-	generated_jpg_file = os.path.join(raw_dir, image_name + ".jpg")
+    image_name = os.path.basename(raw_source).rsplit(".CR2", 1)[0]
+    raw_dir = os.path.dirname(raw_source)
+    generated_jpg_file = os.path.join(raw_dir, image_name + ".jpg")
 
-	exiftool_command = ["exiftool", "-b", "-previewimage", "-w", "jpg"]
-	exiftool_command.append(raw_source)
+    exiftool_command = ["exiftool", "-b", "-previewimage", "-w", "jpg"]
+    exiftool_command.append(raw_source)
 
-	Popen(exiftool_command).wait()
+    Popen(exiftool_command).wait()
 
-	exiftool_command = ["exiftool", "-tagsFromFile", raw_source, "-m"]
-	exiftool_command.append(generated_jpg_file)
+    exiftool_command = ["exiftool", "-tagsFromFile", raw_source, "-m"]
+    exiftool_command.append(generated_jpg_file)
 
-	Popen(exiftool_command).wait()
-	os.remove(generated_jpg_file + "_original")
+    Popen(exiftool_command).wait()
+    os.remove(generated_jpg_file + "_original")
 
-	os.rename(generated_jpg_file, jpg_destination)
+    os.rename(generated_jpg_file, jpg_destination)
 
 def convert_to_low_quality_jpg(directory):
 
-	high_quality_dir = os.path.join(directory, "Images", "High Quality")
-	low_quality_dir = os.path.join(directory, "Images", "Low Quality")
+    high_quality_dir = os.path.join(directory, "Images", "High Quality")
+    low_quality_dir = os.path.join(directory, "Images", "Low Quality")
 
-	high_quality_images = os.listdir(high_quality_dir)
-	low_quality_images = os.listdir(low_quality_dir)
+    high_quality_images = os.listdir(high_quality_dir)
+    low_quality_images = os.listdir(low_quality_dir)
 
-	for image in high_quality_images:
-		if not image in low_quality_images:
+    for image in high_quality_images:
+        if not image in low_quality_images:
 
-			high_quality_image_file = os.path.join(high_quality_dir, image)
-			low_quality_image_file = os.path.join(low_quality_dir, image)
-			downsize_jpg(high_quality_image_file, low_quality_image_file)
+            high_quality_image_file = os.path.join(high_quality_dir, image)
+            low_quality_image_file = os.path.join(low_quality_dir, image)
+            downsize_jpg(high_quality_image_file, low_quality_image_file)
 
 def downsize_jpg(source, destination, size=500000):
-	
-	shutil.copyfile(source, destination)
+    
+    shutil.copyfile(source, destination)
 
-	if get_image_width(destination) < get_image_height(destination):
-		resolution = "x1920"
-	else:
-		resolution = "1920"
+    if get_image_width(destination) < get_image_height(destination):
+        resolution = "x1920"
+    else:
+        resolution = "1920"
 
-	Popen(["convert", "-resize", resolution, destination, destination]).wait()
+    Popen(["convert", "-resize", resolution, destination, destination]).wait()
 
-	if os.path.getsize(destination) > size:
-		jpegoptim_command = ["jpegoptim", "--size=" + str(size), destination]
-		Popen(jpegoptim_command).wait()
+    if os.path.getsize(destination) > size:
+        jpegoptim_command = ["jpegoptim", "--size=" + str(size), destination]
+        Popen(jpegoptim_command).wait()
 
 def get_date_taken(image_file):
 
-	with open(image_file, 'rb') as f:
-		date = str(exifread.process_file(f)["EXIF DateTimeOriginal"])
-	return parse_date_string(date)
+    with open(image_file, 'rb') as f:
+        date = str(exifread.process_file(f)["EXIF DateTimeOriginal"])
+    return parse_date_string(date)
 
 def parse_date_string(date):
 
-	year = date.split(":")[0]
-	month = date.split(":")[1]
-	day = date.split(":")[2].split(" ")[0]
+    year = date.split(":")[0]
+    month = date.split(":")[1]
+    day = date.split(":")[2].split(" ")[0]
 
-	hour = date.split(" ")[1].split(":")[0]
-	minute = date.split(" ")[1].split(":")[1]
-	second = date.split(" ")[1].split(":")[2]
+    hour = date.split(" ")[1].split(":")[0]
+    minute = date.split(" ")[1].split(":")[1]
+    second = date.split(" ")[1].split(":")[2]
 
-	_date = year + "-" + month + "-" + day
-	_time = hour + "-" + minute + "-" + second
+    _date = year + "-" + month + "-" + day
+    _time = hour + "-" + minute + "-" + second
 
-	return  _date + "---" + _time
+    return  _date + "---" + _time
 
 def rename_images_by_date(directory):
 
-	hq_dir = os.path.join(directory, "Images", "High Quality")
-	raw_dir = os.path.join(directory, "Images", "Raw")
+    hq_dir = os.path.join(directory, "Images", "High Quality")
+    raw_dir = os.path.join(directory, "Images", "Raw")
 
-	for image in os.listdir(hq_dir):
-		image_path = os.path.join(hq_dir, image)
-		raw_path = os.path.join(raw_dir, image.rsplit(".", 1)[0] + ".CR2")
+    for image in os.listdir(hq_dir):
+        image_path = os.path.join(hq_dir, image)
+        raw_path = os.path.join(raw_dir, image.rsplit(".", 1)[0] + ".CR2")
 
-		new_name = get_date_taken(image_path)
-		new_jpg_file = os.path.join(hq_dir, new_name + ".JPG")
-		new_raw_file = os.path.join(raw_dir, new_name + ".CR2")
+        new_name = get_date_taken(image_path)
+        new_jpg_file = os.path.join(hq_dir, new_name + ".JPG")
+        new_raw_file = os.path.join(raw_dir, new_name + ".CR2")
 
-		new_jpg_file = avoid_conflicting_filenames(new_jpg_file)
-		new_raw_file = avoid_conflicting_filenames(new_raw_file)
+        new_jpg_file = avoid_conflicting_filenames(new_jpg_file)
+        new_raw_file = avoid_conflicting_filenames(new_raw_file)
 
-		if new_jpg_file != image_path:
-			os.rename(image_path, new_jpg_file)
-			if os.path.isfile(raw_path):
-				os.rename(raw_path, new_raw_file)
+        if new_jpg_file != image_path:
+            os.rename(image_path, new_jpg_file)
+            if os.path.isfile(raw_path):
+                os.rename(raw_path, new_raw_file)
 
 def avoid_conflicting_filenames(file_path):
-	while os.path.isfile(file_path):
-		ext = "." + file_path.rsplit(".", 1)[1]
-		file_path = file_path.split(ext)[0] + "_" + ext
-	return file_path
+    while os.path.isfile(file_path):
+        ext = "." + file_path.rsplit(".", 1)[1]
+        file_path = file_path.split(ext)[0] + "_" + ext
+    return file_path
 
 def get_image_width(image_file):
-	return Image.open(image_file).size[0]
+    return Image.open(image_file).size[0]
 
 def get_image_height(image_file):
-	return Image.open(image_file).size[1]
+    return Image.open(image_file).size[1]
 
 def merge_directories(directories, destination):
 
-	if not os.path.isdir(destination):
-		os.makedirs(destination)
-	create_directory_structure(destination)
+    if not os.path.isdir(destination):
+        os.makedirs(destination)
+    create_directory_structure(destination)
 
-	for directory in directories:
-		move_files_no_conflict(
-			os.path.join(directory, "Images", "Raw"), 
-			os.path.join(destination, "Images", "Raw")
-		)
-		move_files_no_conflict(
-			os.path.join(directory, "Images", "High Quality"), 
-			os.path.join(destination, "Images", "High Quality")
-		)
-		move_files_no_conflict(
-			os.path.join(directory, "Images", "Low Quality"), 
-			os.path.join(destination, "Images", "Low Quality")
-		)
-		move_files_no_conflict(
-			os.path.join(directory, "Videos"), 
-			os.path.join(destination, "Videos")
-		)
+    for directory in directories:
+        move_files_no_conflict(
+            os.path.join(directory, "Images", "Raw"), 
+            os.path.join(destination, "Images", "Raw")
+        )
+        move_files_no_conflict(
+            os.path.join(directory, "Images", "High Quality"), 
+            os.path.join(destination, "Images", "High Quality")
+        )
+        move_files_no_conflict(
+            os.path.join(directory, "Images", "Low Quality"), 
+            os.path.join(destination, "Images", "Low Quality")
+        )
+        move_files_no_conflict(
+            os.path.join(directory, "Videos"), 
+            os.path.join(destination, "Videos")
+        )
 
 def move_files_no_conflict(source, destination):
-	# Checks for conflicts
+    # Checks for conflicts
 
-	for image in os.listdir(source):
-		image_file = os.path.join(source, image)
-		dest_file = os.path.join(destination, image)
+    for image in os.listdir(source):
+        image_file = os.path.join(source, image)
+        dest_file = os.path.join(destination, image)
 
-		while os.path.isfile(dest_file):
-			ext = "." + dest_file.rsplit(".", 1)[1]
-			dest_file = dest_file.split(ext)[0] + "_" + ext
+        while os.path.isfile(dest_file):
+            ext = "." + dest_file.rsplit(".", 1)[1]
+            dest_file = dest_file.split(ext)[0] + "_" + ext
 
-		os.rename(image_file, dest_file)
+        os.rename(image_file, dest_file)
 
 if __name__ == "__main__":
 
-	ensure_dependencies_installed()
-	directories = parse_args()
+    ensure_dependencies_installed()
+    directories = parse_args()
 
-	for directory in directories:
-		redo_directory_structure(directory)
-		convert_missing_jpegs_from_raw(directory)
-		rename_images_by_date(directory)
-		convert_to_low_quality_jpg(directory)
+    for directory in directories:
+        redo_directory_structure(directory)
+        convert_missing_jpegs_from_raw(directory)
+        rename_images_by_date(directory)
+        convert_to_low_quality_jpg(directory)
 
-	if len(directories) > 1:
-		destination = os.path.join(os.path.dirname(directories[0]), "Merged")
-		merge_directories(directories, destination)
+    if len(directories) > 1:
+        destination = os.path.join(os.path.dirname(directories[0]), "Merged")
+        merge_directories(directories, destination)
