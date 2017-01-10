@@ -99,6 +99,12 @@ def move_files(content_dir, raw_dir, jpg_dir, video_dir):
 			os.rename(image_file, os.path.join(jpg_dir, image))
 		elif image.endswith(".MP4"):
 			os.rename(image_file, os.path.join(video_dir, image))
+		elif image.endswith(".jpg"):
+			capital = image.rsplit(".jpg", 1)[0] + ".JPG"
+			os.rename(image_file, os.path.join(jpg_dir, capital))
+		elif image.endswith(".mp4"):
+			capital = image.rsplit(".mp4", 1)[0] + ".MP4"
+			os.rename(image_file, os.path.join(video_dir, capital))
 
 def convert_missing_jpegs_from_raw(directory):
 
@@ -119,8 +125,6 @@ def convert_missing_jpegs_from_raw(directory):
 
 def convert_raw_to_jpg(raw_source, jpg_destination):
 
-	original_date = get_date_taken_cr2(raw_source)
-
 	image_name = os.path.basename(raw_source).rsplit(".CR2", 1)[0]
 	raw_dir = os.path.dirname(raw_source)
 	generated_jpg_file = os.path.join(raw_dir, image_name + ".jpg")
@@ -129,6 +133,13 @@ def convert_raw_to_jpg(raw_source, jpg_destination):
 	exiftool_command.append(raw_source)
 
 	Popen(exiftool_command).wait()
+
+	exiftool_command = ["exiftool", "-tagsFromFile", raw_source, "-m"]
+	exiftool_command.append(generated_jpg_file)
+
+	Popen(exiftool_command).wait()
+	os.remove(generated_jpg_file + "_original")
+
 	os.rename(generated_jpg_file, jpg_destination)
 
 def convert_to_low_quality_jpg(directory):
@@ -162,13 +173,6 @@ def downsize_jpg(source, destination, size=500000):
 		Popen(jpegoptim_command).wait()
 
 def get_date_taken(image_file):
-
-	print(image_file)
-
-	date = Image.open(image_file)._getexif()[36867]
-	return parse_date_string(date)
-
-def get_date_taken_cr2(image_file):
 
 	with open(image_file, 'rb') as f:
 		date = str(exifread.process_file(f)["EXIF DateTimeOriginal"])
@@ -251,7 +255,7 @@ def move_files_no_conflict(source, destination):
 
 	for image in os.listdir(source):
 		image_file = os.path.join(source, image)
-		dest_file = os.path.join(dest, image)
+		dest_file = os.path.join(destination, image)
 
 		while os.path.isfile(dest_file):
 			ext = "." + dest_file.rsplit(".", 1)[1]
