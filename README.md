@@ -61,3 +61,22 @@ Just call the script using
 ```python photosorter.py <directory 1> <directory 2> ... <directory n>```.
 
 This will process each directory individually and then merge them together.
+
+### Dependencies:
+
+The following commands need to be installed and in the system's PATH:
+
+* ```exiftool```
+* ```jpegoptim```
+* ```convert``` (Part of ```imagemagick```)
+
+To install these on Arch Linux, run the following command:
+
+    sudo pacman -S imagemagick jpegoptim perl-image-exiftool
+
+Installation on other distributions may differ.
+
+Additionally, the python package ```exifread``` needs to be installed and
+importable, which can be done via ```pip```:
+
+    pip install exifread --user
