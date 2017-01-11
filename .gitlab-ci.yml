@@ -12,3 +12,4 @@ github_mirror:
 checkstyle:
   stage: test
   script:
+    - pep8 .
