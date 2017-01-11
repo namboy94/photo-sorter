@@ -80,3 +80,8 @@ Additionally, the python package ```exifread``` needs to be installed and
 importable, which can be done via ```pip```:
 
     pip install exifread --user
+
+## Links
+
+* [Github](https://github.com/namboy94/canon-g7x-photosorter)
+* [Gitlab](https://gitlab.namibsun.net/namboy94/canon-g7x-photosorter)
