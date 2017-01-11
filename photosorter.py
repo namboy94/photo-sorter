@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 """
 Copyright Hermann Krumrey <hermann@krumreyh.com>, 2017
 
@@ -14,12 +15,14 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
+
 import os
 import sys
 import shutil
 import exifread
 from PIL import Image
 from subprocess import Popen
+
 
 def ensure_dependencies_installed():
     dependencies = ["exiftool", "jpegoptim", "convert"]
@@ -35,6 +38,7 @@ def ensure_dependencies_installed():
         if not dependency_installed:
             print("Dependency " + dependency + " not installed")
             exit()
+
 
 def parse_args():
 
@@ -56,6 +60,7 @@ def parse_args():
             exit()
         else:
             return directories
+
 
 def redo_directory_structure(directory):
 
@@ -83,6 +88,7 @@ def redo_directory_structure(directory):
                 else:
                     shutil.rmtree(folder_dir)
 
+
 def create_directory_structure(directory):
 
     base_picture = os.path.join(directory, "Images")
@@ -104,6 +110,7 @@ def create_directory_structure(directory):
 
     return base_picture, raw, high_quality, low_quality, videos
 
+
 def move_files(content_dir, raw_dir, jpg_dir, video_dir):
 
     for image in os.listdir(content_dir):
@@ -123,6 +130,7 @@ def move_files(content_dir, raw_dir, jpg_dir, video_dir):
             capital = image.rsplit(".mp4", 1)[0] + ".MP4"
             os.rename(image_file, os.path.join(video_dir, capital))
 
+
 def convert_missing_jpegs_from_raw(directory):
 
     jpg_dir = os.path.join(directory, "Images", "High Quality")
@@ -137,8 +145,9 @@ def convert_missing_jpegs_from_raw(directory):
         raw_image_file = os.path.join(raw_dir, raw)
         destination_jpg_file = os.path.join(jpg_dir, image_name + ".JPG")
 
-        if not os.path.isfile(destination_jpg_file):                        
+        if not os.path.isfile(destination_jpg_file):
             convert_raw_to_jpg(raw_image_file, destination_jpg_file)
+
 
 def convert_raw_to_jpg(raw_source, jpg_destination):
 
@@ -159,6 +168,7 @@ def convert_raw_to_jpg(raw_source, jpg_destination):
 
     os.rename(generated_jpg_file, jpg_destination)
 
+
 def convert_to_low_quality_jpg(directory):
 
     high_quality_dir = os.path.join(directory, "Images", "High Quality")
@@ -168,14 +178,15 @@ def convert_to_low_quality_jpg(directory):
     low_quality_images = os.listdir(low_quality_dir)
 
     for image in high_quality_images:
-        if not image in low_quality_images:
+        if image not in low_quality_images:
 
             high_quality_image_file = os.path.join(high_quality_dir, image)
             low_quality_image_file = os.path.join(low_quality_dir, image)
             downsize_jpg(high_quality_image_file, low_quality_image_file)
 
+
 def downsize_jpg(source, destination, size=500000):
-    
+
     shutil.copyfile(source, destination)
 
     if get_image_width(destination) < get_image_height(destination):
@@ -189,11 +200,13 @@ def downsize_jpg(source, destination, size=500000):
         jpegoptim_command = ["jpegoptim", "--size=" + str(size), destination]
         Popen(jpegoptim_command).wait()
 
+
 def get_date_taken(image_file):
 
     with open(image_file, 'rb') as f:
         date = str(exifread.process_file(f)["EXIF DateTimeOriginal"])
     return parse_date_string(date)
+
 
 def parse_date_string(date):
 
@@ -208,7 +221,8 @@ def parse_date_string(date):
     _date = year + "-" + month + "-" + day
     _time = hour + "-" + minute + "-" + second
 
-    return  _date + "---" + _time
+    return _date + "---" + _time
+
 
 def rename_images_by_date(directory):
 
@@ -231,17 +245,21 @@ def rename_images_by_date(directory):
             if os.path.isfile(raw_path):
                 os.rename(raw_path, new_raw_file)
 
+
 def avoid_conflicting_filenames(file_path):
     while os.path.isfile(file_path):
         ext = "." + file_path.rsplit(".", 1)[1]
         file_path = file_path.split(ext)[0] + "_" + ext
     return file_path
 
+
 def get_image_width(image_file):
     return Image.open(image_file).size[0]
 
+
 def get_image_height(image_file):
     return Image.open(image_file).size[1]
+
 
 def merge_directories(directories, destination):
 
@@ -251,21 +269,22 @@ def merge_directories(directories, destination):
 
     for directory in directories:
         move_files_no_conflict(
-            os.path.join(directory, "Images", "Raw"), 
+            os.path.join(directory, "Images", "Raw"),
             os.path.join(destination, "Images", "Raw")
         )
         move_files_no_conflict(
-            os.path.join(directory, "Images", "High Quality"), 
+            os.path.join(directory, "Images", "High Quality"),
             os.path.join(destination, "Images", "High Quality")
         )
         move_files_no_conflict(
-            os.path.join(directory, "Images", "Low Quality"), 
+            os.path.join(directory, "Images", "Low Quality"),
             os.path.join(destination, "Images", "Low Quality")
         )
         move_files_no_conflict(
-            os.path.join(directory, "Videos"), 
+            os.path.join(directory, "Videos"),
             os.path.join(destination, "Videos")
         )
+
 
 def move_files_no_conflict(source, destination):
     # Checks for conflicts
@@ -279,6 +298,7 @@ def move_files_no_conflict(source, destination):
             dest_file = dest_file.split(ext)[0] + "_" + ext
 
         os.rename(image_file, dest_file)
+
 
 if __name__ == "__main__":
 
