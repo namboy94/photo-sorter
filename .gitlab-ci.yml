@@ -1,5 +1,6 @@
 stages:
   - mirror
+  - test
 
 github_mirror:
   stage: mirror
@@ -7,3 +8,7 @@ github_mirror:
     - git checkout master
     - git pull origin master
     - git push -f git@github.com:namboy94/canon-g7x-photosorter.git master
+
+checkstyle:
+  stage: test
+  script:
