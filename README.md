@@ -1,4 +1,4 @@
-# photosorter.py
+# photosorter.py [![build status](https://gitlab.namibsun.net/namboy94/canon-g7x-photosorter/badges/master/build.svg)](https://gitlab.namibsun.net/namboy94/canon-g7x-photosorter/commits/master)
 
 ![Logo](logo/logo-readme.png "Logo")
 
