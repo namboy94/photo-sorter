@@ -1,5 +1,7 @@
 # photosorter.py
 
+![Logo](logo/logo-readme.png "Logo")
+
 This is a python script to automatically sort photos from a Canon camera.
 In principle, this should also work with other directories containing
 images, but it is primarily done for the **Canon Powershot G7 X**'s
