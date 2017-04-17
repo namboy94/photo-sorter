@@ -87,3 +87,5 @@ importable, which can be done via ```pip```:
 
 * [Github](https://github.com/namboy94/canon-g7x-photosorter)
 * [Gitlab](https://gitlab.namibsun.net/namboy94/canon-g7x-photosorter)
+* [Git Statistics (gitstats)](https://gitstats.namibsun.net/gitstats/canon-g7x-photosorter/index.html)
+* [Git Statistics (git_stats)](https://gitstats.namibsun.net/git_stats/canon-g7x-photosorter/index.html)
