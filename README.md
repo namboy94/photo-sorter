@@ -1,6 +1,6 @@
 # photosorter.py [![build status](https://gitlab.namibsun.net/namboy94/canon-g7x-photosorter/badges/master/build.svg)](https://gitlab.namibsun.net/namboy94/canon-g7x-photosorter/commits/master)
 
-![Logo](logo/logo-readme.png "Logo")
+![Logo](resources/logo/logo-readme.png "Logo")
 
 This is a python script to automatically sort photos from a Canon camera.
 In principle, this should also work with other directories containing
@@ -83,8 +83,10 @@ importable, which can be done via ```pip```:
 
     pip install exifread --user
 
-## Links
+## Further Information
 
+* [Changelog](https://gitlab.namibsun.net/namboy94/canon-g7x-photosorter/raw/master/CHANGELOG)
+* [License (GPLv3)](https://gitlab.namibsun.net/namboy94/canon-g7x-photosorter/raw/master/LICENSE)
 * [Github](https://github.com/namboy94/canon-g7x-photosorter)
 * [Gitlab](https://gitlab.namibsun.net/namboy94/canon-g7x-photosorter)
 * [Git Statistics (gitstats)](https://gitstats.namibsun.net/gitstats/canon-g7x-photosorter/index.html)

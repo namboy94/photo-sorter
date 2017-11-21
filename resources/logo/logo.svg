@@ -14,7 +14,7 @@
    viewBox="0 0 200 200"
    version="1.1"
    id="svg8"
-   inkscape:version="0.92.1 r"
+   inkscape:version="0.92.2 5c3e80d, 2017-08-06"
    sodipodi:docname="logo.svg">
   <defs
      id="defs2">
@@ -41,13 +41,13 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="0.98994949"
-     inkscape:cx="212.05901"
-     inkscape:cy="397.89719"
+     inkscape:cx="414.08952"
+     inkscape:cy="399.20657"
      inkscape:document-units="mm"
      inkscape:current-layer="layer1"
      showgrid="false"
      inkscape:window-width="1920"
-     inkscape:window-height="1057"
+     inkscape:window-height="1055"
      inkscape:window-x="0"
      inkscape:window-y="0"
      inkscape:window-maximized="1" />
@@ -59,7 +59,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -70,29 +70,29 @@
      transform="translate(0,-97)">
     <rect
        id="rect3684"
-       width="169.80573"
-       height="90.120361"
-       x="15.743635"
-       y="164.14177"
-       style="fill:#d3d3d3;fill-opacity:1;stroke:#000000;stroke-width:20.70163345;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:100;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1" />
+       width="139.91521"
+       height="74.256683"
+       x="30.083658"
+       y="171.93851"
+       style="fill:#d3d3d3;fill-opacity:1;stroke:#000000;stroke-width:17.05757332;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:100;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1" />
     <rect
-       style="fill:#d3d3d3;fill-opacity:1;stroke:#000000;stroke-width:11.66499996;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:100;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       style="fill:#d3d3d3;fill-opacity:1;stroke:#000000;stroke-width:9.61163712;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:100;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
        id="rect4761"
-       width="35.546848"
-       height="23.519718"
-       x="139.78197"
-       y="130.75836" />
+       width="29.289618"
+       height="19.379597"
+       x="132.28781"
+       y="144.4315" />
     <circle
-       style="fill:#d3d3d3;fill-opacity:1;stroke:#000000;stroke-width:11.66499996;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:100;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:stroke markers fill"
+       style="fill:#d3d3d3;fill-opacity:1;stroke:#000000;stroke-width:9.61163712;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:100;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:stroke markers fill"
        id="path4763"
-       cx="134.57021"
-       cy="210.53831"
-       r="20.446119" />
+       cx="127.99346"
+       cy="210.16798"
+       r="16.847036" />
     <flowRoot
        xml:space="preserve"
        id="flowRoot4765"
        style="font-style:normal;font-weight:normal;font-size:40px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none"
-       transform="matrix(0.74000621,0,0,0.74000621,-17.634665,191.85683)"><flowRegion
+       transform="matrix(0.60974462,0,0,0.60974462,2.5808627,194.77495)"><flowRegion
          id="flowRegion4767"><rect
            id="rect4769"
            width="196.97975"
