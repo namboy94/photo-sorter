@@ -302,8 +302,7 @@ def move_files_no_conflict(source, destination):
         os.rename(image_file, dest_file)
 
 
-if __name__ == "__main__":
-
+def main():
     ensure_dependencies_installed()
     directories = parse_args()
 
@@ -316,3 +315,7 @@ if __name__ == "__main__":
     if len(directories) > 1:
         destination = os.path.join(os.path.dirname(directories[0]), "Merged")
         merge_directories(directories, destination)
+
+
+if __name__ == "__main__":
+    main()
