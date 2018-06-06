@@ -1,4 +1,9 @@
-# photosorter.py [![build status](https://gitlab.namibsun.net/namboy94/canon-g7x-photosorter/badges/master/build.svg)](https://gitlab.namibsun.net/namboy94/canon-g7x-photosorter/commits/master)
+# photo-sorter.py 
+
+|master|develop|
+|:---:|:---:|
+|[![build status](https://gitlab.namibsun.net/namibsun/python/photo-sorter/badges/master/build.svg)](https://gitlab.namibsun.net/namibsun/python/photo-sorter/commits/master)|[![build status](https://gitlab.namibsun.net/namibsun/python/photo-sorter/badges/develop/build.svg)](https://gitlab.namibsun.net/namibsun/python/photo-sorter/commits/develop)|
+
 
 ![Logo](resources/logo/logo-readme.png "Logo")
 
@@ -60,7 +65,7 @@ be called ```Merged```
 ## How do I use this script?
 
 Just call the script using
-```python photosorter.py <directory 1> <directory 2> ... <directory n>```.
+```photo-sorter <directory 1> <directory 2> ... <directory n>```.
 
 This will process each directory individually and then merge them together.
 
@@ -78,16 +83,11 @@ To install these on Arch Linux, run the following command:
 
 Installation on other distributions may differ.
 
-Additionally, the python package ```exifread``` needs to be installed and
-importable, which can be done via ```pip```:
-
-    pip install exifread --user
-
 ## Further Information
 
-* [Changelog](https://gitlab.namibsun.net/namboy94/canon-g7x-photosorter/raw/master/CHANGELOG)
-* [License (GPLv3)](https://gitlab.namibsun.net/namboy94/canon-g7x-photosorter/raw/master/LICENSE)
-* [Github](https://github.com/namboy94/canon-g7x-photosorter)
-* [Gitlab](https://gitlab.namibsun.net/namboy94/canon-g7x-photosorter)
-* [Git Statistics (gitstats)](https://gitstats.namibsun.net/gitstats/canon-g7x-photosorter/index.html)
-* [Git Statistics (git_stats)](https://gitstats.namibsun.net/git_stats/canon-g7x-photosorter/index.html)
+* [Changelog](CHANGELOG)
+* [License (GPLv3)](LICENSE)
+* [Gitlab](https://gitlab.namibsun.net/namibsun/python/photo-sorter)
+* [Github](https://github.com/namboy94/photo-sorter)
+* [Progstats](https://progstats.namibsun.net/projects/photo-sorter)
+* [PyPi](https://pypi.org/project/photo-sorter)
