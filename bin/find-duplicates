@@ -1,0 +1,103 @@
+#!/usr/bin/env python3
+"""LICENSE
+Copyright 2017 Hermann Krumrey <hermann@krumreyh.com>
+
+This file is part of photo-sorter.
+
+photo-sorter is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+photo-sorter is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with photo-sorter.  If not, see <http://www.gnu.org/licenses/>.
+LICENSE"""
+
+import os
+import hashlib
+import argparse
+from typing import List, Tuple
+from colorama import Fore, Style
+
+
+def main():
+    """
+    The main function of this script
+    Traverses a given directory and finds any duplicate files based on their
+    SHA1 hash
+    :return: None
+    """
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument("target",
+                        help="The directory to search for duplicates")
+    target = parser.parse_args().target
+
+    print("Calculating Hashes...")
+    hash_data = load_checksums(target)
+    print("Calculated Hashes")
+    duplicates = []
+
+    while len(hash_data) > 0:
+
+        file, _hash = hash_data.pop(0)
+        same = [file]
+        to_pop = []
+
+        for i, (cmp_file, cmp_hash) in enumerate(hash_data):
+            if _hash == cmp_hash:
+                same.append(cmp_file)
+                to_pop.append(i)
+
+        if len(same) > 1:
+            duplicates.append(same)
+            for i in sorted(to_pop, reverse=True):
+                hash_data.pop(i)
+
+    for duplicate in duplicates:
+        print("-" * 80)
+        for file in duplicate:
+            print("{}{}{}".format(Fore.LIGHTYELLOW_EX, file, Style.RESET_ALL))
+        print("-" * 80)
+
+
+def load_checksums(directory: str) -> List[Tuple[str, str]]:
+    """
+    Loads the checksums of all files in the directory recursively
+    :param directory: The directory to traverse
+    :return: A list of tuples pairing file paths with SHA1 hashes
+    """
+
+    hash_data = []
+
+    for child in os.listdir(directory):
+        child_path = os.path.join(directory, child)
+
+        if os.path.isfile(child_path):
+            checksum = sha1(child_path)
+            hash_data.append((child_path, checksum))
+        else:
+            hash_data += load_checksums(child_path)
+
+    return hash_data
+
+
+def sha1(file: str) -> str:
+    """
+    Calculates the SHA1 hash of a file
+    :param file: The path to the file
+    :return: The SHA1 hash
+    """
+    print("Calculating hash for {}".format(file))
+    with open(file, "rb") as f:
+        content = f.read()
+    return hashlib.sha1(content).hexdigest()
+
+
+if __name__ == "__main__":
+    main()

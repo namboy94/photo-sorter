@@ -41,7 +41,7 @@ if __name__ == "__main__":
         packages=find_packages(),
         scripts=list(map(lambda x: os.path.join("bin", x), os.listdir("bin"))),
         install_requires=[
-            "exifread", "Pillow"
+            "exifread", "Pillow", "colorama"
         ],
         include_package_data=True,
         zip_safe=False
