@@ -121,5 +121,7 @@ if __name__ == "__main__":
     try:
         main()
     except BaseException:
+        pass
+    finally:
         with open("hash-cache.json", "w") as f:
             json.dump(CACHE, f)
