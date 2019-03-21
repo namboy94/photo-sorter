@@ -19,10 +19,17 @@ along with photo-sorter.  If not, see <http://www.gnu.org/licenses/>.
 LICENSE"""
 
 import os
+import json
 import hashlib
 import argparse
 from typing import List, Tuple
 from colorama import Fore, Style
+
+
+CACHE = {}
+"""
+Caches hashes so they don't have to be recalculated every time
+"""
 
 
 def main():
@@ -85,11 +92,29 @@ def sha1(file: str) -> str:
     :param file: The path to the file
     :return: The SHA1 hash
     """
-    print("Calculating hash for {}".format(file))
-    with open(file, "rb") as f:
-        content = f.read()
-    return hashlib.sha1(content).hexdigest()
+    old_hash = CACHE.get(file)
+
+    if old_hash is None:
+        print("Calculating hash for {}".format(file))
+        with open(file, "rb") as fil:
+            content = fil.read()
+        new_hash = hashlib.sha1(content).hexdigest()
+        CACHE[file] = new_hash
+        return new_hash
+
+    else:
+        print("Using old hash for {}".format(file))
+        return old_hash
 
 
 if __name__ == "__main__":
-    main()
+    if os.path.isfile("hash-cache.json"):
+        with open("hash-cache.json", "r") as f:
+            CACHE = json.load(f)
+
+    # noinspection PyBroadException
+    try:
+        main()
+    except BaseException:
+        with open("hash-cache.json", "w") as f:
+            json.dump(CACHE, f)
