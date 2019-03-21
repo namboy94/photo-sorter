@@ -24,6 +24,7 @@ import hashlib
 import argparse
 from typing import List, Tuple
 from colorama import Fore, Style
+from subprocess import check_output
 
 
 CACHE = {}
@@ -96,9 +97,13 @@ def sha1(file: str) -> str:
 
     if old_hash is None:
         print("Calculating hash for {}".format(file))
-        with open(file, "rb") as fil:
-            content = fil.read()
-        new_hash = hashlib.sha1(content).hexdigest()
+        try:
+            with open(file, "rb") as fil:
+                content = fil.read()
+            new_hash = hashlib.sha1(content).hexdigest()
+        except MemoryError:
+            output = check_output(["sha1sum", file]).decode("utf-8")
+            new_hash = output.split(" ")[0]
         CACHE[file] = new_hash
         return new_hash
 
